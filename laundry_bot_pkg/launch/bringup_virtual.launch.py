@@ -18,13 +18,19 @@ Usage:
     ros2 run laundry_bot record_cli start "pick item from basket"
     ...watch it loop...
     ros2 run laundry_bot record_cli stop
+
+Add the RViz2 visualizer (arm model + TF + camera frames + workspace):
+    ros2 launch laundry_bot bringup_virtual.launch.py with_visualizer:=true
 """
 import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import IncludeLaunchDescription
 from launch_ros.actions import Node
 
 
@@ -36,6 +42,7 @@ def generate_launch_description():
         DeclareLaunchArgument('dataset_root', default_value=''),
         DeclareLaunchArgument('use_wrist', default_value='true'),
         DeclareLaunchArgument('waypoints', default_value=''),
+        DeclareLaunchArgument('with_visualizer', default_value='false'),
 
         # ── Driver on the virtual CAN bus (no hardware) ────────────────
         Node(
@@ -70,5 +77,14 @@ def generate_launch_description():
             parameters=[os.path.join(cfg, 'record.yaml'),
                         {'use_wrist': LaunchConfiguration('use_wrist'),
                          'root': LaunchConfiguration('dataset_root')}],
+        ),
+
+        # ── Optional visualizer (arm TF + env) ────────────────────────
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(
+                os.path.join(pkg_share, 'launch', 'visualizer.launch.py')),
+            launch_arguments={'use_wrist': LaunchConfiguration('use_wrist'),
+                               'rviz': LaunchConfiguration('rviz')}.items(),
+            condition=IfCondition(LaunchConfiguration('with_visualizer')),
         ),
     ])

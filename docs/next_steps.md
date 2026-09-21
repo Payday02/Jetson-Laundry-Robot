@@ -31,15 +31,24 @@ Nothing has touched real hardware yet.
 
 ## Jetson bring-up sequence (when the arm is assembled)
 
+**Full step-by-step: see `docs/build_checklist.md`** — 10 steps from finished
+arm to first training data, each with a verification check and a failure path.
+Summary:
+
 1. JetPack 6.2 (L4T 36, Ubuntu 22.04) + ROS 2 Humble
 2. `colcon build` in this workspace (deps: rclpy, python-can, numpy,
    lerobot==0.6.1, depthai + OAK-D ros driver, webcam via v4l2)
-3. `arm.yaml`: `can_interface: candle` (CANalyst-II) or `socketcan` (USB adapter),
-   channel + bitrate 500 k, driver CAN IDs 1–6
+3. Fill in the real dimensions: `ur7e_like.yaml` (DH + home pose),
+   `arm.yaml` (per-axis pulses/limits/direction/current),
+   `urdf/laundry_arm.urdf.xacro` (must match the DH table for RViz)
 4. Single-axis test: home, `ros2 topic echo /joint_states` vs. `/joint_target`,
    hit estop. Then all six axes.
 5. OAK-D: fixed/elevated mount (~40–60 cm above workspace, angled down),
-   depthai-ros driver. Webcam: wrist mount.
+   depthai-ros driver. Webcam: wrist mount. Set camera `frame_id` to
+   `front_cam` / `wrist_cam` so the visualizer places them correctly.
+6. Watch it all: `ros2 launch laundry_bot visualizer.launch.py` — arm model,
+   TF tree, camera frames, workspace env. Or
+   `bringup_virtual.launch.py with_visualizer:=true` for the full fake pipeline.
 
 ## Quest 2 teleop
 

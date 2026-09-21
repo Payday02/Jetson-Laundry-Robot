@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<!--
+  laundry_arm.urdf.xacro — visual URDF for the 6-DOF laundry arm (RViz only).
+
+  ⚠️  The <xacro:property> values below MUST stay in sync with the
+  `dh` table in config/ur7e_like.yaml (kinematics.py uses those for real FK/IK).
+  The joint origins were computed from the Craig-DH chain at theta=0 with
+  kinematics.dh_matrix, so TF from this URDF matches the arm_driver_node
+  exactly. When the arm's real dimensions are measured, update BOTH files.
+
+  Convention: base_link origin at the shoulder-pan axis, Z up, X toward the
+  initial shoulder_lift direction. Joint i rotates about base Z (J1) or
+  link frame Z per Craig-DH — see ur7e_like.yaml for the chain.
+
+  This file is for visualization only (RViz / robot_state_publisher).
+  No inertial properties, no collision meshes — keep it lightweight.
+-->
+<robot name="laundry_arm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ── Link lengths (m) — mirror config/ur7e_like.yaml `dh` ─────────── -->
+  <xacro:property name="d1" value="0.1625"/>   <!-- base height to J1 axis -->
+  <xacro:property name="a2" value="-0.425"/>   <!-- J1->J2 -->
+  <xacro:property name="a3" value="-0.3922"/>  <!-- J2->J3 -->
+  <xacro:property name="d4" value="0.1333"/>   <!-- J3->J4 -->
+  <xacro:property name="d5" value="0.0997"/>   <!-- J4->J5 -->
+  <xacro:property name="d6" value="0.0996"/>   <!-- J5->J6 (flange) -->
+
+  <!-- Joint limits (rad) — soft limits for the visualizer; real limits
+       are enforced in config/arm.yaml -->
+  <xacro:property name="lim_large" value="3.1416"/>
+  <xacro:property name="lim_wrist" value="6.2832"/>
+
+  <!-- ── base_link ─────────────────────────────────────────────────────── -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.08" radius="0.09"/>
+      </geometry>
+      <origin xyz="0 0 0.04" rpy="0 0 0"/>
+      <material name="dark_grey"><color rgba="0.25 0.25 0.25 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── J1: shoulder pan (about base Z) ───────────────────────────────── -->
+  <joint name="shoulder_pan" type="revolute">
+    <parent link="base_link"/>
+    <child link="link1"/>
+    <origin xyz="0 0 ${d1}" rpy="${pi/2} 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-lim_large}" upper="${lim_large}" velocity="2.0" effort="50"/>
+  </joint>
+  <link name="link1">
+    <visual>
+      <geometry>
+        <cylinder length="${-a2}" radius="0.06"/>
+      </geometry>
+      <origin xyz="${a2/2.0} 0 0" rpy="0 0 0"/>
+      <material name="orange"><color rgba="1.0 0.55 0.1 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── J2: shoulder lift ─────────────────────────────────────────────── -->
+  <joint name="shoulder_lift" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="${a2} 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-lim_large}" upper="${lim_large}" velocity="2.0" effort="50"/>
+  </joint>
+  <link name="link2">
+    <visual>
+      <geometry>
+        <cylinder length="${-a3}" radius="0.05"/>
+      </geometry>
+      <origin xyz="${a3/2.0} 0 0" rpy="0 0 0"/>
+      <material name="orange"><color rgba="1.0 0.55 0.1 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── J3: elbow flex ────────────────────────────────────────────────── -->
+  <joint name="elbow_flex" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="${a3} 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-lim_large}" upper="${lim_large}" velocity="2.0" effort="30"/>
+  </joint>
+  <link name="link3">
+    <visual>
+      <geometry>
+        <cylinder length="0.07" radius="0.045"/>
+      </geometry>
+      <origin xyz="0 0 ${d4/2.0}" rpy="0 0 0"/>
+      <material name="orange"><color rgba="1.0 0.55 0.1 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── J4: wrist 1 ───────────────────────────────────────────────────── -->
+  <joint name="wrist_1" type="revolute">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="0 0 ${d4}" rpy="${pi/2} 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-lim_wrist}" upper="${lim_wrist}" velocity="3.0" effort="15"/>
+  </joint>
+  <link name="link4">
+    <visual>
+      <geometry>
+        <cylinder length="${d5}" radius="0.035"/>
+      </geometry>
+      <origin xyz="0 0 ${d5/2.0}" rpy="0 0 0"/>
+      <material name="dark_grey"><color rgba="0.25 0.25 0.25 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── J5: wrist 2 ───────────────────────────────────────────────────── -->
+  <joint name="wrist_2" type="revolute">
+    <parent link="link4"/>
+    <child link="link5"/>
+    <origin xyz="0 0 ${d5}" rpy="${-pi/2} 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-lim_wrist}" upper="${lim_wrist}" velocity="3.0" effort="15"/>
+  </joint>
+  <link name="link5">
+    <visual>
+      <geometry>
+        <cylinder length="${d6}" radius="0.03"/>
+      </geometry>
+      <origin xyz="0 0 ${d6/2.0}" rpy="0 0 0"/>
+      <material name="dark_grey"><color rgba="0.25 0.25 0.25 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── J6: wrist 3 (flange) ──────────────────────────────────────────── -->
+  <joint name="wrist_3" type="revolute">
+    <parent link="link5"/>
+    <child link="link6"/>
+    <origin xyz="0 0 ${d6}" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${-lim_wrist}" upper="${lim_wrist}" velocity="3.0" effort="10"/>
+  </joint>
+  <link name="link6">
+    <visual>
+      <geometry>
+        <box size="0.06 0.06 0.03"/>
+      </geometry>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <material name="blue"><color rgba="0.2 0.5 0.9 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── TCP: gripper / hanger-hook tip (matches tool_offset in config) ── -->
+  <joint name="tcp_joint" type="fixed">
+    <parent link="link6"/>
+    <child link="tcp"/>
+    <origin xyz="0 0 0.03" rpy="0 0 0"/>
+  </joint>
+  <link name="tcp">
+    <visual>
+      <geometry>
+        <sphere radius="0.008"/>
+      </geometry>
+      <material name="red"><color rgba="0.9 0.1 0.1 1.0"/></material>
+    </visual>
+  </link>
+
+  <!-- ── World -> base (arm mounted at table height) ───────────────────── -->
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+  <link name="world"/>
+
+</robot>

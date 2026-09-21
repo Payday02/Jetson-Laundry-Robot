@@ -20,13 +20,17 @@ laundry_bot_pkg/
     fake_teleop_node.py   synthetic teleop trajectory for hardware-free pipeline tests
     fake_camera_node.py   synthetic camera images for hardware-free pipeline tests
     lerobot_recorder_node  LeRobotDataset v3.0 recorder (2 cams + state + action @ 30 Hz)
+    visualizer_node.py    camera TF (front static + wrist via FK) + workspace env cloud
     record_cli            terminal episode control: start <task> / stop [--discard]
     estop.py              standalone emergency stop (no ROS required)
   config/                 arm.yaml (axis specs) · ur7e_like.yaml (DH/home/workspace)
                           teleop.yaml · record.yaml
-  launch/                 teleop_record.launch.py · bringup_virtual.launch.py
+  urdf/                   laundry_arm.urdf.xacro — visual URDF (must match ur7e_like.yaml)
+  rviz/                   laundry.rviz — preconfigured RViz2 scene
+  launch/                 teleop_record · bringup_virtual · visualizer launch files
 docs/quest2ros2_setup.md  Quest 2 bridge install + topic contract + tuning
 docs/next_steps.md        status, what's blocked on the arm design, bring-up sequence
+docs/build_checklist.md   step-by-step: finished arm → first training data
 ```
 
 ## Build
@@ -44,6 +48,24 @@ ros2 launch laundry_bot bringup_virtual.launch.py dataset_root:=/tmp/ds
 ros2 run laundry_bot record_cli start "virtual demo"   # other terminal
 ros2 run laundry_bot record_cli stop
 ```
+
+## Visualizer (RViz2)
+
+Arm model + TF tree + camera frames + a synthetic workspace (table, baskets,
+hanger racks) — works with the virtual bringup or with real cameras:
+
+```bash
+# standalone (needs arm_driver_node running for joint_states):
+ros2 launch laundry_bot visualizer.launch.py
+
+# or attach it to the virtual pipeline:
+ros2 launch laundry_bot bringup_virtual.launch.py with_visualizer:=true
+```
+
+Point your real camera drivers at frame_ids `front_cam` / `wrist_cam` and
+their point clouds/images land in the right place (OAK-D: `frame_id` param;
+usb_cam: same). The URDF is a placeholder sized from the UR7e DH table —
+keep `urdf/laundry_arm.urdf.xacro` in sync with `config/ur7e_like.yaml`.
 
 ## TODO before real hardware
 
