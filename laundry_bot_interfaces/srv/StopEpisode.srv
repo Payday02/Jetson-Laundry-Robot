@@ -1,0 +1,7 @@
+# Stop (and save) the current episode.
+# If discard=true the buffered frames are thrown away instead of saved.
+bool discard
+---
+bool success
+int32 num_frames
+string message

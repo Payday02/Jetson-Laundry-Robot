@@ -1,0 +1,6 @@
+# Drive one axis to its home (limit switch / zero) and set zero.
+int8 axis
+int32 speed_rpm
+---
+bool success
+string message

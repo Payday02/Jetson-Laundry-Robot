@@ -1,0 +1,7 @@
+# Enable or disable the MKS stepper drivers.
+# axis < 0 targets ALL axes; otherwise a single axis.
+int8 axis
+bool enable
+---
+bool success
+string message

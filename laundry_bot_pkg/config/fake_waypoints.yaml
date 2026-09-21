@@ -1,0 +1,17 @@
+# fake_waypoints.yaml — optional custom trajectory for fake_teleop_node
+#
+# Waypoints are in the ROBOT BASE frame (m), in order.
+#   x,y,z   TCP target
+#   dwell   seconds to pause AT the waypoint (0 = pass through)
+#   yaw     optional heading (rad, about base Z); omitted = keep current
+# The player interpolates linearly between waypoints (capped at 0.25 m/s)
+# and loops forever. Default (no file) is one laundry micro-cycle:
+# home -> basket -> lift -> table -> flatten circle -> home.
+waypoints:
+  - {x: 0.22, y: -0.14, z: 0.86, dwell: 1.0}   # home
+  - {x: 0.10, y: -0.35, z: 0.70, dwell: 0.3}   # over basket
+  - {x: 0.10, y: -0.35, z: 0.45, dwell: 0.5}   # into basket
+  - {x: 0.10, y: -0.35, z: 0.75, dwell: 0.3}   # lift
+  - {x: 0.30, y: -0.10, z: 0.80, dwell: 0.3}   # carry
+  - {x: 0.30, y: -0.10, z: 0.55, dwell: 1.0}   # lower on table
+  - {x: 0.22, y: -0.14, z: 0.86, dwell: 1.0}   # home

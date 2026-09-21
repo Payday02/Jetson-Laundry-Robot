@@ -1,0 +1,88 @@
+# arm.yaml — arm_driver_node configuration
+#
+# ⚠️ PLACEHOLDER VALUES — replace with your arm's real specs when the design
+#    settles. The UR7e-like dimensions below are guesses; only
+#    pulses_per_rev, can_id, min/max limits and home offsets matter for the
+#    driver (kinematics lengths live in ur7e_like.yaml, separate file).
+
+ros__parameters:
+  arm_driver_node:
+    # python-can interface: socketcan (USB adapter), candle (CANalyst-II),
+    # virtual (loopback testing without hardware)
+    can_interface: socketcan
+    can_channel: can0
+    can_bitrate: 500000
+
+    # Command loop republishes the current target at this rate (Hz).
+    # 30 Hz is plenty: each FE command carries an absolute position and the
+    # driver interpolates between commands on its own.
+    command_rate: 30.0
+    feedback_rate: 100.0
+
+    # Safety at startup: keep False until bring-up is validated.
+    auto_enable_on_start: false
+    auto_home_on_start: false
+
+    # One entry per joint, in joint order (shoulder pan .. wrist roll).
+    #   can_id:        CAN arbitration id of that axis's MKS driver
+    #   pulses_per_rev: total steps per motor revolution (full steps × microsteps).
+    #                   57D + 16 microsteps = 4000; 42D + 16 = 2000 (typical)
+    #   direction:     +1 or -1, flip if a joint moves the wrong way
+    #   min_rad/max_rad: software joint limits (radians), your safety window
+    #   max_speed:     max RPM sent in FE commands
+    #   current_ma:    working current (0-5200)
+    axes:
+      - name: shoulder_pan
+        can_id: 1
+        pulses_per_rev: 4000
+        direction: 1
+        max_speed: 120          # rad/s = 120rpm/(2pi) ≈ 1.2 rad/s
+        acc: 5
+        current_ma: 2000
+        min_rad: -3.1416
+        max_rad: 3.1416
+      - name: shoulder_lift
+        can_id: 2
+        pulses_per_rev: 4000
+        direction: 1
+        max_speed: 120
+        acc: 5
+        current_ma: 2500
+        min_rad: -3.1416
+        max_rad: 3.1416
+      - name: elbow_flex
+        can_id: 3
+        pulses_per_rev: 4000
+        direction: 1
+        max_speed: 150
+        acc: 5
+        current_ma: 2000
+        min_rad: -3.1416
+        max_rad: 3.1416
+      - name: wrist_1
+        can_id: 4
+        pulses_per_rev: 2000
+        direction: 1
+        max_speed: 200
+        acc: 8
+        current_ma: 1200
+        min_rad: -3.1416
+        max_rad: 3.1416
+      - name: wrist_2
+        can_id: 5
+        pulses_per_rev: 2000
+        direction: 1
+        max_speed: 200
+        acc: 8
+        current_ma: 1200
+        min_rad: -3.1416
+        max_rad: 3.1416
+      - name: wrist_3
+        can_id: 6
+        pulses_per_rev: 2000
+        direction: 1
+        max_speed: 200
+        acc: 8
+        current_ma: 1200
+        min_rad: -6.2832
+        max_rad: 6.2832

@@ -1,0 +1,4 @@
+# Send 0xF7 (emerg stop) to all axes immediately.
+---
+bool success
+string message

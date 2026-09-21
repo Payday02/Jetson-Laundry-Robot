@@ -1,0 +1,21 @@
+# record.yaml — lerobot_recorder_node parameters
+ros__parameters:
+  lerobot_recorder_node:
+    repo_id: "paden/laundry_teleop"   # HF repo id (used even for local-only storage)
+    root: ""                          # e.g. /home/paden/laundry_data/ep1; "" = $HF_LEROBOT_HOME/repo_id
+    fps: 30
+    use_videos: true                  # mp4 (compact, standard) vs image (png, debug)
+    robot_type: "laundry_bot_ur7e_like"
+
+    # Camera topics (Isaac ROS / depthai publish under the camera name).
+    # Adjust to whatever your OAK-D launch publishes; the recorder resizes to
+    # image_height x image_width automatically.
+    front_image_topic: "/oak_d/color/image_raw"
+    wrist_image_topic: "/wrist_cam/image_raw"
+    use_wrist: false                  # flip to true once the wrist webcam is mounted
+    image_height: 480
+    image_width: 640
+
+    joint_states_topic: "joint_states"
+    joint_target_topic: "joint_target"
+    num_joints: 6

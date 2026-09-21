@@ -1,0 +1,8 @@
+# Request to start a new teleop demo episode.
+# task: the natural-language task string stored with every frame
+#       (used for task-conditioned policy training).
+string task
+---
+bool success
+int32 episode_index
+string message

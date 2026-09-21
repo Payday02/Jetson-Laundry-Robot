@@ -1,0 +1,6 @@
+# Read the accumulated encoder count for one axis.
+int8 axis
+---
+bool success
+int32 encoder_value
+string message

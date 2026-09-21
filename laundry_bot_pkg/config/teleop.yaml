@@ -1,0 +1,44 @@
+# teleop.yaml — teleop_quest_node parameters
+#
+# Bridge: Quest2ROS2 (Taokt/Quest2ROS2) publishes
+#   /q2r_right_hand_pose   (geometry_msgs/PoseStamped)
+#   /q2r_right_hand_inputs (quest2ros/OVR2ROSInputs)
+# See docs/quest2ros2_setup.md for install + frame alignment.
+ros__parameters:
+  teleop_quest_node:
+    kin_config: "$(find laundry_bot)/config/ur7e_like.yaml"
+
+    # Which controller drives the arm.
+    hand: right
+    pose_topic: ""          # "" -> /q2r_<hand>_hand_pose
+    inputs_topic: ""        # "" -> /q2r_<hand>_hand_inputs
+    # Latch button: 'button_lower' (Q2R2 convention) or 'press_index' (trigger).
+    latch_button: button_lower
+    # Fallback latch via a plain Bool topic (true=latch, false=hold):
+    latch_topic: teleop/latch
+
+    # Rotation from Quest world frame (X right, Y forward, Z up) to the
+    # robot base frame. Default = standing BEHIND the arm facing it:
+    #   robot_x = +quest_y ; robot_y = -quest_x ; robot_z = +quest_z
+    # If motion is mirrored/rotated, swap signs here (must stay a rotation).
+    pos_map: [[0.0, 1.0, 0.0],
+              [-1.0, 0.0, 0.0],
+              [0.0, 0.0, 1.0]]
+
+    joint_states_topic: joint_states
+    joint_target_topic: joint_target
+    control_rate: 30.0
+
+    # 1.0 = 1:1 hand->arm. 0.5 = half speed, finer control (good for
+    # hanger threading).
+    pos_gain: 0.6
+    # Low-pass on controller position per tick: higher = snappier
+    pos_smooth: 0.35
+    # 'yaw': wrist keeps its attitude, controller heading steers it (start here)
+    # 'full': full 6-DOF orientation following (harder, precise)
+    orientation_mode: yaw
+
+    # Safety
+    ik_max_error: 0.03      # m — above this the arm holds (no target sent)
+    max_jstep_rad: 0.05     # max joint change per 30 Hz tick (~1.5 rad/s)
+    latch_timeout_s: 10.0   # stop following if the VR feed goes stale

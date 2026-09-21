@@ -1,0 +1,6 @@
+# Set working current (mA) for one axis.
+int8 axis
+int32 ma
+---
+bool success
+string message
