@@ -26,6 +26,7 @@ laundry_bot_pkg/
                           teleop.yaml · record.yaml
   launch/                 teleop_record.launch.py · bringup_virtual.launch.py
 docs/quest2ros2_setup.md  Quest 2 bridge install + topic contract + tuning
+docs/next_steps.md        status, what's blocked on the arm design, bring-up sequence
 ```
 
 ## Build
